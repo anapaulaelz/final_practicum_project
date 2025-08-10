@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demand Forecasting · COSMOS</title>
+    <link rel="stylesheet" href="../css/cosmic-sidebar.css">
+    <link rel="stylesheet" href="../css/demand-forecasting.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+    <script src="../js/cosmic-sidebar.js"></script>
+</head>
+<body>
+    <!-- Sidebar will be injected here by cosmic-sidebar.js -->
+    <div class="main-content">
+        <div class="cosmic-header">
+            <h1 class="cosmic-title">Demand Forecasting</h1>
+            <p class="cosmic-description">Navigate through time and data to unveil future market patterns</p>
+        </div>
+
+        <div class="container">
+
+            <div class="dashboard-grid">
+                <!-- Forecast Chart Section -->
+                <div class="card main-chart">
+                    <div class="controls">
+                        <div class="date-filters">
+                            <div class="filter-group">
+                                <label for="fromDate">From:</label>
+                                <input type="date" id="fromDate" class="date-input">
+                            </div>
+                            <div class="filter-group">
+                                <label for="toDate">To:</label>
+                                <input type="date" id="toDate" class="date-input">
+                            </div>
+                            <button id="applyFilters" class="apply-btn">Apply Filters</button>
+                            <button id="resetFilters" class="reset-btn">Reset</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Sales Overview Section -->
+                <div class="card sales-overview">
+                    <h2>Total Units Sold</h2>
+                    <div class="bar-container">
+                        <canvas id="salesBarChart"></canvas>
+                    </div>
+                    <div class="stats-container">
+                        <div id="totalSalesCount" class="total-count"></div>
+                    </div>
+                </div>
+
+                <!-- Conversion Rate Section -->
+                <div class="card conversion-rate">
+                    <h2>Conversion Rate</h2>
+                    <div class="bar-container">
+                        <canvas id="conversionChart"></canvas>
+                    </div>
+                    <div class="stats-container">
+                        <div class="conversion-rate-info">
+                            <span class="rate-label">Overall Conversion Rate</span>
+                            <div id="conversionRateDisplay" class="rate-value"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Dates Section -->
+                <div class="card cosmic-calendar">
+                    <h2>Key Dates</h2>
+                    <div class="date-list">
+                        <div class="cosmic-date-item" data-holiday="independence">
+                            <div class="date-header">
+                                <div class="date-number">16</div>
+                                <div class="date-info">
+                                    <div class="month">SEP</div>
+                                    <div class="holiday-name">Independence Day</div>
+                                </div>
+                            </div>
+                            <div class="impact-indicator high">High Impact</div>
+                        </div>
+                        
+                        <div class="cosmic-date-item" data-holiday="revolution">
+                            <div class="date-header">
+                                <div class="date-number">20</div>
+                                <div class="date-info">
+                                    <div class="month">NOV</div>
+                                    <div class="holiday-name">Revolution Day</div>
+                                </div>
+                            </div>
+                            <div class="impact-indicator medium">Medium Impact</div>
+                        </div>
+                        
+                        <div class="cosmic-date-item" data-holiday="christmas">
+                            <div class="date-header">
+                                <div class="date-number">25</div>
+                                <div class="date-info">
+                                    <div class="month">DEC</div>
+                                    <div class="holiday-name">Christmas</div>
+                                </div>
+                            </div>
+                            <div class="impact-indicator high">High Impact</div>
+                        </div>
+                        
+                        <div class="cosmic-date-item" data-holiday="epiphany">
+                            <div class="date-header">
+                                <div class="date-number">06</div>
+                                <div class="date-info">
+                                    <div class="month">JAN</div>
+                                    <div class="holiday-name">Día de Reyes</div>
+                                </div>
+                            </div>
+                            <div class="impact-indicator high">High Impact</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Holiday Description Modal -->
+                    <div id="holidayModal" class="holiday-modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 id="modalTitle"></h3>
+                                <span class="close-modal">&times;</span>
+                            </div>
+                            <div class="modal-body">
+                                <p id="modalDescription"></p>
+                                <div class="modal-impact">
+                                    <span class="impact-label">Business Impact:</span>
+                                    <span id="modalImpact"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- To Do Board Section -->
+                <div class="card ai-insight">
+                    <h2>To Do Board - Demand</h2>
+                    <div class="demand-tasks-container">
+                        <!-- To Do Tasks -->
+                        <div class="task-section">
+                            <h3 class="task-section-title">To Do</h3>
+                            <div class="task-list" id="demandTodoList">
+                                <!-- Tasks will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <!-- In Progress Tasks -->
+                        <div class="task-section">
+                            <h3 class="task-section-title">In Progress</h3>
+                            <div class="task-list" id="demandProgressList">
+                                <!-- Tasks will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <!-- Completed Tasks -->
+                        <div class="task-section">
+                            <h3 class="task-section-title">Completed</h3>
+                            <div class="task-list" id="demandCompletedList">
+                                <!-- Tasks will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/demand-forecasting.js"></script>
+</body>
+</html>

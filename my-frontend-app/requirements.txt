@@ -1,0 +1,36 @@
+# Cosmos Frontend Requirements
+
+# Python Data Analysis Libraries
+pandas>=2.0.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.14.0
+jupyter>=1.0.0
+openpyxl>=3.1.0
+xlsxwriter>=3.1.0
+
+# Libraries (suggested via CDN)
+- Vanilla JS (core logic)
+- [Optional] Axios (for HTTP requests)
+- [Optional] Chart.js (dashboard charts)
+- [Optional] FullCalendar.js (calendar page)
+- [Optional] Sortable.js (To Do Board drag & drop)
+- [Optional] SweetAlert2 (alerts & notifications)
+- [Optional] Day.js (date manipulation)
+- [Optional] Bootstrap or Bulma (responsive CSS, optional)
+
+# Key Functions/Features
+- SPA navigation (JS-based page switching)
+- Dashboard: Render charts, summary cards
+- Demand Forecasting: Display graphs, tables, filters
+- Smart Inventory: Inventory list, search, filter, edit
+- Alarms & Alerts: Show notifications, alert history
+- Calendar: Interactive calendar, add/view events
+- Fulfillment: Order tracking, status updates
+- To Do Board: Kanban board, drag & drop tasks
+- Partners: List partners, contact info, search
+- Document Base: Upload, view, download documents
+
+# Note:
+# All libraries can be included via CDN in HTML files or installed locally if using a build tool.

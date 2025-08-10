@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partners · COSMOS</title>
+    <link rel="stylesheet" href="../css/cosmic-sidebar.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+    <script src="../js/cosmic-sidebar.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a0f1f;
+            --bg-card: #141b2d;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --accent-blue: #4299e1;
+            --accent-green: #48bb78;
+            --accent-yellow: #ecc94b;
+            --accent-red: #f56565;
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 70px;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+        }
+
+        .container {
+            margin: 0;
+            padding: 2rem 1rem 2rem 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .cosmic-header {
+            position: relative;
+            text-align: center;
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+            background: var(--bg-card);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .cosmic-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(66, 153, 225, 0.1) 0%, transparent 50%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .cosmic-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 600;
+            background: linear-gradient(90deg, #4299e1 0%, #9c27b0 50%, #4caf50 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0 0 1rem 0;
+        }
+
+        .cosmic-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .suppliers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(350px, 100%), 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .supplier-card {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .supplier-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-blue);
+        }
+
+        .supplier-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .supplier-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .supplier-avatar::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-green), var(--accent-yellow));
+            border-radius: 50%;
+            z-index: -1;
+            animation: avatarGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes avatarGlow {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .supplier-info h3 {
+            margin: 0 0 0.5rem 0;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+        }
+
+        .supplier-role {
+            background: var(--accent-blue);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .supplier-role.internal {
+            background: var(--accent-green);
+        }
+
+        .supplier-role.external {
+            background: var(--accent-yellow);
+            color: #2d3748;
+        }
+
+        .supplier-details {
+            margin-top: 1rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: var(--text-primary);
+            text-align: right;
+        }
+
+        .supplier-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(72, 187, 120, 0.2);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+        }
+
+        .status-pending {
+            background: rgba(236, 201, 75, 0.2);
+            color: var(--accent-yellow);
+            border: 1px solid var(--accent-yellow);
+        }
+
+        .contact-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, 
+                rgba(66, 153, 225, 0.8) 0%, 
+                rgba(90, 103, 216, 0.8) 100%);
+            color: white;
+            border: 1px solid rgba(66, 153, 225, 0.3);
+            box-shadow: 0 4px 15px rgba(66, 153, 225, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(66, 153, 225, 0.4);
+            background: linear-gradient(135deg, 
+                rgba(66, 153, 225, 1) 0%, 
+                rgba(90, 103, 216, 1) 100%);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .statistics-section {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        footer {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .suppliers-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+            
+            .cosmic-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .cosmic-header {
+                padding: 2rem 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar will be injected here by cosmic-sidebar.js -->
+    <div class="main-content">
+        <div class="cosmic-header">
+            <h1 class="cosmic-title">Supplier Management</h1>
+            <p class="cosmic-description">Navigate through your galactic network of suppliers and partners</p>
+        </div>
+
+        <div class="container">
+
+        <section class="statistics-section">
+            <h2>Partner Overview</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Total Partners</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">1</div>
+                    <div class="stat-label">Active Suppliers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Influencers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Internal Team</div>
+                </div>
+            </div>
+        </section>
+
+            <section>
+                <h2>Our Partners</h2>
+                <div class="suppliers-grid">
+                    <!-- Suppliers -->
+                    <div class="supplier-card">
+                        <div class="supplier-header">
+                            <div class="supplier-avatar">🧑‍🚀</div>
+                            <div class="supplier-info">
+                                <h3>AromaTech SA de CV</h3>
+                                <span class="supplier-role external">Supplier</span>
+                            </div>
+                        </div>
+                        <div class="supplier-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Lead Time:</span>
+                                <span class="detail-value">15 days</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Email:</span>
+                                <span class="detail-value">ventas@aromatech.com</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Phone:</span>
+                                <span class="detail-value">+52 81 9988 2211</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Location:</span>
+                                <span class="detail-value">Mexico</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Status:</span>
+                                <span class="supplier-status status-active">Active</span>
+                            </div>
+                        </div>
+                        <div class="contact-actions">
+                            <button class="btn btn-primary">📧 Contact</button>
+                            <button class="btn btn-secondary">📄 Details</button>
+                        </div>
+                    </div>
+
+                    <!-- Internal Team Members -->
+                    <div class="supplier-card">
+                        <div class="supplier-header">
+                            <div class="supplier-avatar">👩‍🚀</div>
+                            <div class="supplier-info">
+                                <h3>Valeria Elizondo</h3>
+                                <span class="supplier-role internal">Employee</span>
+                            </div>
+                        </div>
+                        <div class="supplier-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Area:</span>
+                                <span class="detail-value">Operations</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Email:</span>
+                                <span class="detail-value">maria.gonzalez@leboret.com</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Phone:</span>
+                                <span class="detail-value">+52 55 1234 5678</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Location:</span>
+                                <span class="detail-value">Mexico</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Status:</span>
+                                <span class="supplier-status status-active">Active</span>
+                            </div>
+                        </div>
+                        <div class="contact-actions">
+                            <button class="btn btn-primary">📧 Contact</button>
+                            <button class="btn btn-secondary">👤 Profile</button>
+                        </div>
+                    </div>
+
+                    <div class="supplier-card">
+                        <div class="supplier-header">
+                            <div class="supplier-avatar">🧑‍🚀</div>
+                            <div class="supplier-info">
+                                <h3>German Gomez</h3>
+                                <span class="supplier-role internal">Owner</span>
+                            </div>
+                        </div>
+                        <div class="supplier-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Area:</span>
+                                <span class="detail-value">Direction</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Email:</span>
+                                <span class="detail-value">sofia@leboret.com</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Phone:</span>
+                                <span class="detail-value">+52 55 6789 4321</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Location:</span>
+                                <span class="detail-value">Mexico</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Status:</span>
+                                <span class="supplier-status status-active">Active</span>
+                            </div>
+                        </div>
+                        <div class="contact-actions">
+                            <button class="btn btn-primary">📧 Contact</button>
+                            <button class="btn btn-secondary">👤 Profile</button>
+                        </div>
+                    </div>
+
+                    <!-- Influencers -->
+                    <div class="supplier-card">
+                        <div class="supplier-header">
+                            <div class="supplier-avatar">👩‍🚀</div>
+                            <div class="supplier-info">
+                                <h3>Valeria Ruiz</h3>
+                                <span class="supplier-role external">Influencer</span>
+                            </div>
+                        </div>
+                        <div class="supplier-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Collaboration:</span>
+                                <span class="detail-value">Paid Post + Affiliate</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Social Media:</span>
+                                <span class="detail-value">@valeria.glow</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Start Date:</span>
+                                <span class="detail-value">10/04/25</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Location:</span>
+                                <span class="detail-value">Mexico</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Status:</span>
+                                <span class="supplier-status status-active">Active</span>
+                            </div>
+                        </div>
+                        <div class="contact-actions">
+                            <button class="btn btn-primary">📱 Contact</button>
+                            <button class="btn btn-secondary">📊 Analytics</button>
+                        </div>
+                    </div>
+
+                    <div class="supplier-card">
+                        <div class="supplier-header">
+                            <div class="supplier-avatar">🧑‍🚀</div>
+                            <div class="supplier-info">
+                                <h3>Daniel Peralta</h3>
+                                <span class="supplier-role external">Influencer</span>
+                            </div>
+                        </div>
+                        <div class="supplier-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Collaboration:</span>
+                                <span class="detail-value">Gifting Only</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Social Media:</span>
+                                <span class="detail-value">@daniel.style.mx</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Start Date:</span>
+                                <span class="detail-value">02/03/25</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Location:</span>
+                                <span class="detail-value">Mexico</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Status:</span>
+                                <span class="supplier-status status-active">Active</span>
+                            </div>
+                        </div>
+                        <div class="contact-actions">
+                            <button class="btn btn-primary">📱 Contact</button>
+                            <button class="btn btn-secondary">📊 Analytics</button>
+                        </div>
+                    </div>
+
+                    <div class="supplier-card">
+                        <div class="supplier-header">
+                            <div class="supplier-avatar">👩‍🚀</div>
+                            <div class="supplier-info">
+                                <h3>Tania Herrera</h3>
+                                <span class="supplier-role external">Influencer</span>
+                            </div>
+                        </div>
+                        <div class="supplier-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Collaboration:</span>
+                                <span class="detail-value">Paid Campaign</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Social Media:</span>
+                                <span class="detail-value">@tanreadsperfumes</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Start Date:</span>
+                                <span class="detail-value">01/05/25</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Location:</span>
+                                <span class="detail-value">Global</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Status:</span>
+                                <span class="supplier-status status-active">Active</span>
+                            </div>
+                        </div>
+                        <div class="contact-actions">
+                            <button class="btn btn-primary">📱 Contact</button>
+                            <button class="btn btn-secondary">📊 Analytics</button>
+                        </div>
+                    </div>
+
+                    <div class="supplier-card">
+                        <div class="supplier-header">
+                            <div class="supplier-avatar">🧑‍🚀</div>
+                            <div class="supplier-info">
+                                <h3>Adrián Vela</h3>
+                                <span class="supplier-role external">Influencer</span>
+                            </div>
+                        </div>
+                        <div class="supplier-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Collaboration:</span>
+                                <span class="detail-value">Affiliate Only</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Social Media:</span>
+                                <span class="detail-value">@vela.notes</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Start Date:</span>
+                                <span class="detail-value">15/01/25</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Location:</span>
+                                <span class="detail-value">Mexico</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Status:</span>
+                                <span class="supplier-status status-active">Active</span>
+                            </div>
+                        </div>
+                        <div class="contact-actions">
+                            <button class="btn btn-primary">📱 Contact</button>
+                            <button class="btn btn-secondary">📊 Analytics</button>
+                        </div>
+                    </div>
+
+                    <div class="supplier-card">
+                        <div class="supplier-header">
+                            <div class="supplier-avatar">👩‍🚀</div>
+                            <div class="supplier-info">
+                                <h3>Jules Anderson</h3>
+                                <span class="supplier-role external">Influencer</span>
+                            </div>
+                        </div>
+                        <div class="supplier-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Collaboration:</span>
+                                <span class="detail-value">Paid Post + PR box</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Social Media:</span>
+                                <span class="detail-value">@perfume.withjules</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Start Date:</span>
+                                <span class="detail-value">20/08/25</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Location:</span>
+                                <span class="detail-value">Canada/US</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Status:</span>
+                                <span class="supplier-status status-pending">Pending</span>
+                            </div>
+                        </div>
+                        <div class="contact-actions">
+                            <button class="btn btn-primary">📱 Contact</button>
+                            <button class="btn btn-secondary">📊 Analytics</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        <footer>
+            <p>&copy; 2025 COSMOS - Space-Grade Analytics Platform</p>
+        </footer>
+        </div>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html>
+</body>
+</html>

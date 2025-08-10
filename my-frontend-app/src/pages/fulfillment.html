@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fulfillment · COSMOS</title>
+    <link rel="stylesheet" href="../css/cosmic-sidebar.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/fulfillment.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+    <script src="../js/cosmic-sidebar.js"></script>
+</head>
+<body>
+    <!-- Sidebar will be injected here by cosmic-sidebar.js -->
+    <div class="main-content">
+        <div class="cosmic-header">
+            <h1 class="cosmic-title">Fulfillment</h1>
+            <p class="cosmic-description">Navigate through intelligent logistics to optimize order processing and shipping efficiency</p>
+        </div>
+
+        <div class="container">
+
+            <div class="dashboard-grid">
+            <!-- Data Analysis Summary -->
+            <section class="card summary-section">
+                <h2>Data Analysis Summary</h2>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h3>Today's Orders</h3>
+                        <div class="metric-value" id="todayOrders">24</div>
+                        <div class="metric-change positive">+12% vs yesterday</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Avg Fulfillment Time</h3>
+                        <div class="metric-value" id="avgFulfillment">4.2 days</div>
+                        <div class="metric-change negative">+0.3 vs target</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>FIFO Compliance</h3>
+                        <div class="metric-value" id="fifoCompliance">94%</div>
+                        <div class="metric-change positive">+2% this week</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Pending Orders</h3>
+                        <div class="metric-value" id="pendingOrders">18</div>
+                        <div class="metric-change neutral">Same as yesterday</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Order Priority Matrix -->
+            <section class="card priority-section">
+                <h2>🎯 Order Priority Matrix</h2>
+                <div class="priority-controls">
+                    <div class="priority-legend">
+                        <span class="legend-item critical">🔴 Critical (7+ days)</span>
+                        <span class="legend-item high">🟡 High (5-6 days)</span>
+                        <span class="legend-item medium">🟢 Medium (3-4 days)</span>
+                        <span class="legend-item low">⚪ Low (1-2 days)</span>
+                    </div>
+                    <button class="btn-refresh" onclick="refreshPriorityMatrix()">
+                        <i class="fas fa-sync-alt"></i> Refresh Matrix
+                    </button>
+                </div>
+                
+                <div class="priority-matrix">
+                    <table class="priority-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Product</th>
+                                <th>Zone</th>
+                                <th>Days Since Order</th>
+                                <th>Priority Score</th>
+                                <th>Assigned To</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="priorityTableBody">
+                            <!-- Priority table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            </div>
+        </div>
+        <footer>
+            <p>&copy; 2025 COSMOS - Space-Grade Analytics Platform</p>
+        </footer>
+    </div>
+    <script src="../js/cosmic-sidebar.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/fulfillment.js"></script>
+</body>
+</html>

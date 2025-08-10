@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Inventory · COSMOS</title>
+    <link rel="stylesheet" href="../css/cosmic-sidebar.css">
+    <link rel="stylesheet" href="../css/smart-inventory.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/cosmic-sidebar.js"></script>
+    <script src="../js/smart-inventory.js"></script>
+</head>
+<body>
+    <!-- Sidebar will be injected here by cosmic-sidebar.js -->
+    <div class="main-content">
+        <div class="cosmic-header">
+            <h1 class="cosmic-title">Smart Inventory</h1>
+            <p class="cosmic-description">Navigate through intelligent analytics to optimize your inventory flow and prevent stockouts</p>
+        </div>
+
+        <div class="container">
+
+            <div class="dashboard-grid">
+            <!-- Inventory Overview Dashboard -->
+            <section class="card inventory-overview">
+                <h2>Inventory Dashboard</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card critical" data-kpi="critical">
+                        <h3>Critical Stock</h3>
+                        <div class="metric-value">1</div>
+                        <p>Products below safety stock</p>
+                        <div class="click-indicator">Click for details</div>
+                    </div>
+                    <div class="metric-card warning" data-kpi="reorder">
+                        <h3>Reorder Alerts</h3>
+                        <div class="metric-value">3</div>
+                        <p>Products need reordering</p>
+                        <div class="click-indicator">Click for details</div>
+                    </div>
+                    <div class="metric-card good" data-kpi="products">
+                        <h3>Total Products</h3>
+                        <div class="metric-value">5</div>
+                        <p>Active SKUs</p>
+                        <div class="click-indicator">Click for details</div>
+                    </div>
+                    <div class="metric-card info" data-kpi="value">
+                        <h3>Total Value</h3>
+                        <div class="metric-value">$37,760</div>
+                        <p>Current inventory value</p>
+                        <div class="click-indicator">Click for details</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- KPI Details Modal -->
+            <div class="kpi-modal" id="kpiModal">
+                <div class="kpi-modal-content">
+                    <div class="kpi-modal-header">
+                        <h3 id="kpiModalTitle">KPI Details</h3>
+                        <button class="kpi-modal-close" id="kpiModalClose">&times;</button>
+                    </div>
+                    <div class="kpi-modal-body" id="kpiModalBody">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart Reorder Points -->
+            <section class="card reorder-management">
+                <div class="section-header">
+                    <h2>Smart Reorder Points</h2>
+                    <button class="formula-toggle-btn" id="formulaToggle" title="View Formulas">
+                        <span class="formula-icon">∑</span>
+                    </button>
+                </div>
+                <div class="reorder-explanation" id="reorderExplanation" style="display: none;">
+                    <p><strong>Formula:</strong> Reorder Point = (Average Daily Demand × Lead Time) + Safety Stock</p>
+                    <p><strong>Lead Time:</strong> 15 days (AromaTech SA de CV) + 2 days buffer = 17 days</p>
+                </div>
+                
+                <div class="inventory-table-container">
+                    <table class="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Current Stock</th>
+                                <th>Avg Daily Demand</th>
+                                <th>Reorder Point</th>
+                                <th>Safety Stock</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="critical-row">
+                                <td>
+                                    <div class="product-info">
+                                        <strong>Set Descubriendo LeBorêt</strong>
+                                        <span class="sku">SKU: 2</span>
+                                    </div>
+                                </td>
+                                <td><span class="stock-count critical">13</span></td>
+                                <td>0.28</td>
+                                <td>25</td>
+                                <td>5</td>
+                                <td><span class="status critical">CRITICAL</span></td>
+                            </tr>
+                            <tr class="warning-row">
+                                <td>
+                                    <div class="product-info">
+                                        <strong>Set LeBorêt No. 1</strong>
+                                        <span class="sku">SKU: 1</span>
+                                    </div>
+                                </td>
+                                <td><span class="stock-count warning">28</span></td>
+                                <td>1.13</td>
+                                <td>45</td>
+                                <td>10</td>
+                                <td><span class="status warning">LOW</span></td>
+                            </tr>
+                            <tr class="good-row">
+                                <td>
+                                    <div class="product-info">
+                                        <strong>Manhattan Eau de Parfum</strong>
+                                        <span class="sku">SKU: 2002</span>
+                                    </div>
+                                </td>
+                                <td><span class="stock-count good">56</span></td>
+                                <td>0.16</td>
+                                <td>20</td>
+                                <td>6</td>
+                                <td><span class="status good">GOOD</span></td>
+                            </tr>
+                            <tr class="good-row">
+                                <td>
+                                    <div class="product-info">
+                                        <strong>Sahara Eau de Parfum</strong>
+                                        <span class="sku">SKU: 1035</span>
+                                    </div>
+                                </td>
+                                <td><span class="stock-count good">37</span></td>
+                                <td>0.03</td>
+                                <td>18</td>
+                                <td>6</td>
+                                <td><span class="status good">GOOD</span></td>
+                            </tr>
+                            <tr class="warning-row">
+                                <td>
+                                    <div class="product-info">
+                                        <strong>Tundra Eau de Parfum</strong>
+                                        <span class="sku">SKU: 10</span>
+                                    </div>
+                                </td>
+                                <td><span class="stock-count warning">28</span></td>
+                                <td>0.04</td>
+                                <td>22</td>
+                                <td>7</td>
+                                <td><span class="status warning">LOW</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Supplier Information -->
+            <section class="card supplier-info">
+                <h2>Supplier Management</h2>
+                <div class="supplier-card">
+                    <div class="supplier-header">
+                        <div class="supplier-avatar">🧑‍🚀</div>
+                        <div class="supplier-info-content">
+                            <h3>AromaTech SA de CV</h3>
+                            <span class="status active">Active</span>
+                        </div>
+                    </div>
+                    <div class="supplier-details">
+                        <div class="detail-item">
+                            <strong>Lead Time:</strong> 15 days
+                        </div>
+                        <div class="detail-item">
+                            <strong>Contact:</strong> ventas@aromatech.com
+                        </div>
+                        <div class="detail-item">
+                            <strong>Phone:</strong> +52 81 9988 2211
+                        </div>
+                        <div class="detail-item">
+                            <strong>Location:</strong> Mexico
+                        </div>
+                    </div>
+                    <button class="btn btn-primary">Contact Supplier</button>
+                </div>
+            </section>
+
+            <!-- Inventory Analytics -->
+            <section class="card inventory-analytics">
+                <h2>Inventory Analytics</h2>
+                <div class="analytics-grid">
+                    <div class="chart-container">
+                        <h3>Stock Levels Trend</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="inventoryChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- To Do Board - Inventory -->
+            <section class="card ai-recommendations">
+                <h2>To Do Board - Inventory</h2>
+                <div class="inventory-tasks-container">
+                    <!-- To Do Tasks -->
+                    <div class="task-section">
+                        <h3 class="task-section-title">To Do</h3>
+                        <div class="task-list" id="inventoryTodoList">
+                            <!-- Tasks will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- In Progress Tasks -->
+                    <div class="task-section">
+                        <h3 class="task-section-title">In Progress</h3>
+                        <div class="task-list" id="inventoryProgressList">
+                            <!-- Tasks will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Completed Tasks -->
+                    <div class="task-section">
+                        <h3 class="task-section-title">Completed</h3>
+                        <div class="task-list" id="inventoryCompletedList">
+                            <!-- Tasks will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stockout Prevention -->
+            <section class="card stockout-prevention">
+                <h2>Stockout Prevention System</h2>
+                <div class="prevention-features">
+                    <div class="feature-card">
+                        <h3>🔔 Smart Alerts</h3>
+                        <p>Automated notifications when stock reaches reorder points</p>
+                        <label class="toggle">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📧 Supplier Auto-Contact</h3>
+                        <p>Automatically send reorder requests to suppliers</p>
+                        <label class="toggle">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📈 Dynamic Reorder Points</h3>
+                        <p>Adjust reorder points based on sales trends</p>
+                        <label class="toggle">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+            </div>
+        </div>
+        <footer>
+            <p>&copy; 2025 COSMOS - Space-Grade Analytics Platform</p>
+        </footer>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do Board · COSMOS</title>
+    <link rel="stylesheet" href="../css/cosmic-sidebar.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+    <script src="../js/cosmic-sidebar.js"></script>
+    <style>
+        /* COSMOS Theme Variables */
+        :root {
+            --bg-primary: #0a0f1f;
+            --bg-card: #141b2d;
+            --bg-column: #1a2332;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --accent-blue: #4299e1;
+            --accent-yellow: #ecc94b;
+            --accent-red: #f56565;
+            --accent-green: #48bb78;
+            --accent-purple: #9f7aea;
+            --accent-orange: #ed8936;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .cosmic-header {
+            background: linear-gradient(135deg, var(--bg-card) 0%, #1e2a3e 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cosmic-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+        }
+
+        .cosmic-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 0 0 0.5rem 0;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-blue));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cosmic-description {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .kanban-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--text-secondary);
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--accent-blue);
+            color: var(--text-primary);
+            border-color: var(--accent-blue);
+        }
+
+        .add-task-btn {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: var(--text-primary);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+        }
+
+        .add-task-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            min-height: 70vh;
+        }
+
+        .kanban-column {
+            background: var(--bg-column);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .column-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .column-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .column-count {
+            background: var(--text-secondary);
+            color: var(--bg-primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            min-height: 200px;
+        }
+
+        .task-card {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: grab;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .task-card.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+            cursor: grabbing;
+        }
+
+        .task-list.drag-over {
+            background: rgba(66, 153, 225, 0.1);
+            border: 2px dashed var(--accent-blue);
+            border-radius: 8px;
+        }
+
+        .task-card.demand { border-left-color: var(--accent-blue); }
+        .task-card.fulfillment { border-left-color: var(--accent-green); }
+        .task-card.inventory { border-left-color: var(--accent-orange); }
+        .task-card.alerts { border-left-color: var(--accent-red); }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .task-priority {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-high {
+            background: rgba(245, 101, 101, 0.2);
+            color: var(--accent-red);
+        }
+
+        .priority-medium {
+            background: rgba(236, 201, 75, 0.2);
+            color: var(--accent-yellow);
+        }
+
+        .priority-low {
+            background: rgba(72, 187, 120, 0.2);
+            color: var(--accent-green);
+        }
+
+        .task-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin: 0.5rem 0;
+            line-height: 1.4;
+        }
+
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .task-module {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .module-demand {
+            background: rgba(66, 153, 225, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .module-fulfillment {
+            background: rgba(72, 187, 120, 0.2);
+            color: var(--accent-green);
+        }
+
+        .module-inventory {
+            background: rgba(237, 137, 54, 0.2);
+            color: var(--accent-orange);
+        }
+
+        .module-alerts {
+            background: rgba(245, 101, 101, 0.2);
+            color: var(--accent-red);
+        }
+
+        .task-date {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            text-align: center;
+            min-height: 200px;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateY(-50px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--bg-column);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--text-secondary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border-color: var(--text-primary);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: var(--text-primary);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .kanban-board {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .cosmic-title {
+                font-size: 2rem;
+            }
+
+            .kanban-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar will be injected here by cosmic-sidebar.js -->
+    <div class="main-content">
+        <div class="cosmic-header">
+            <h1 class="cosmic-title">Mission Control Board</h1>
+            <p class="cosmic-description">Centralized command center for all operational tasks and alerts</p>
+        </div>
+
+        <div class="kanban-controls">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All Modules</button>
+                <button class="filter-btn" data-filter="demand">Demand Forecasting</button>
+                <button class="filter-btn" data-filter="fulfillment">Fulfillment</button>
+                <button class="filter-btn" data-filter="inventory">Smart Inventory</button>
+                <button class="filter-btn" data-filter="alerts">Alarms & Alerts</button>
+            </div>
+            <button class="add-task-btn" id="addTaskBtn">+ Add Task</button>
+        </div>
+
+        <div class="kanban-board">
+            <!-- To Do Column -->
+            <div class="kanban-column">
+                <div class="column-header">
+                    <h3 class="column-title">
+                        To Do
+                        <span class="column-count" id="todoCount">0</span>
+                    </h3>
+                </div>
+                <div class="task-list" id="todoList">
+                    <!-- Sample tasks will be populated by JavaScript -->
+                    <div class="empty-column">
+                        <div class="empty-icon">📋</div>
+                        <p>No pending tasks</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- In Progress Column -->
+            <div class="kanban-column">
+                <div class="column-header">
+                    <h3 class="column-title">
+                        In Progress
+                        <span class="column-count" id="progressCount">0</span>
+                    </h3>
+                </div>
+                <div class="task-list" id="progressList">
+                    <div class="empty-column">
+                        <div class="empty-icon">⚙️</div>
+                        <p>No active tasks</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed Column -->
+            <div class="kanban-column">
+                <div class="column-header">
+                    <h3 class="column-title">
+                        Completed
+                        <span class="column-count" id="completedCount">0</span>
+                    </h3>
+                </div>
+                <div class="task-list" id="completedList">
+                    <div class="empty-column">
+                        <div class="empty-icon">🎯</div>
+                        <p>No completed tasks</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div class="modal-overlay" id="addTaskModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Task</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <form id="addTaskForm">
+                <div class="form-group">
+                    <label class="form-label" for="taskTitle">Task Title *</label>
+                    <input type="text" id="taskTitle" class="form-input" placeholder="Enter task title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="taskDescription">Description</label>
+                    <textarea id="taskDescription" class="form-input form-textarea" placeholder="Enter task description"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="taskModule">Module *</label>
+                        <select id="taskModule" class="form-input form-select" required>
+                            <option value="">Select module</option>
+                            <option value="demand">Demand Forecasting</option>
+                            <option value="inventory">Smart Inventory</option>
+                            <option value="fulfillment">Fulfillment</option>
+                            <option value="alerts">Alarms & Alerts</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="taskPriority">Priority *</label>
+                        <select id="taskPriority" class="form-input form-select" required>
+                            <option value="">Select priority</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="taskDueDate">Due Date</label>
+                        <input type="date" id="taskDueDate" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="taskStatus">Initial Status</label>
+                        <select id="taskStatus" class="form-input form-select">
+                            <option value="todo">To Do</option>
+                            <option value="progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelTask">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script>
+        // Sample task data - this would typically come from your backend/API
+        const sampleTasks = [
+            // Demand Forecasting Tasks
+            {
+                id: 1,
+                title: "Update demand forecast model",
+                description: "Incorporate latest sales data into Q3 forecasting model",
+                module: "demand",
+                priority: "high",
+                status: "todo",
+                dueDate: "2025-08-10",
+                createdDate: "2025-08-06"
+            },
+            {
+                id: 5,
+                title: "Weekly forecast analysis",
+                description: "Generate automated weekly demand analysis report",
+                module: "demand",
+                priority: "low",
+                status: "completed",
+                dueDate: "2025-08-05",
+                createdDate: "2025-08-01"
+            },
+            {
+                id: 6,
+                title: "Seasonal trend analysis",
+                description: "Analyze Q4 holiday patterns for 2025 forecasting",
+                module: "demand",
+                priority: "medium",
+                status: "progress",
+                dueDate: "2025-08-15",
+                createdDate: "2025-08-03"
+            },
+            {
+                id: 7,
+                title: "Model accuracy validation",
+                description: "Compare predicted vs actual sales for July 2025",
+                module: "demand",
+                priority: "high",
+                status: "todo",
+                dueDate: "2025-08-08",
+                createdDate: "2025-08-06"
+            },
+            {
+                id: 8,
+                title: "Holiday impact assessment",
+                description: "Evaluate Independence Day sales impact on forecast model",
+                module: "demand",
+                priority: "medium",
+                status: "completed",
+                dueDate: "2025-08-07",
+                createdDate: "2025-08-04"
+            },
+            
+            // Smart Inventory Tasks
+            {
+                id: 3,
+                title: "Critical inventory rebalancing",
+                description: "Rebalance stock levels for products below safety threshold",
+                module: "inventory",
+                priority: "high",
+                status: "todo",
+                dueDate: "2025-08-07",
+                createdDate: "2025-08-06"
+            },
+            {
+                id: 9,
+                title: "Update reorder points",
+                description: "Recalculate reorder points based on Q3 demand patterns",
+                module: "inventory",
+                priority: "medium",
+                status: "progress",
+                dueDate: "2025-08-12",
+                createdDate: "2025-08-04"
+            },
+            {
+                id: 10,
+                title: "Vendor performance review",
+                description: "Assess AromaTech delivery times and adjust lead time calculations",
+                module: "inventory",
+                priority: "low",
+                status: "completed",
+                dueDate: "2025-08-05",
+                createdDate: "2025-08-01"
+            },
+            {
+                id: 11,
+                title: "SKU rationalization analysis",
+                description: "Identify slow-moving products for potential discontinuation",
+                module: "inventory",
+                priority: "medium",
+                status: "todo",
+                dueDate: "2025-08-15",
+                createdDate: "2025-08-06"
+            },
+            {
+                id: 12,
+                title: "ABC classification update",
+                description: "Reclassify inventory based on value and velocity analysis",
+                module: "inventory",
+                priority: "high",
+                status: "progress",
+                dueDate: "2025-08-09",
+                createdDate: "2025-08-05"
+            },
+            {
+                id: 13,
+                title: "Safety stock optimization",
+                description: "Optimize safety stock levels for Manhattan Eau de Parfum",
+                module: "inventory",
+                priority: "medium",
+                status: "completed",
+                dueDate: "2025-08-04",
+                createdDate: "2025-08-02"
+            },
+            
+            // Fulfillment Tasks
+            {
+                id: 2,
+                title: "Process pending shipments",
+                description: "Review and approve 15 pending shipment orders",
+                module: "fulfillment",
+                priority: "medium",
+                status: "progress",
+                dueDate: "2025-08-08",
+                createdDate: "2025-08-05"
+            },
+            {
+                id: 14,
+                title: "Optimize delivery routes",
+                description: "Analyze and optimize last-mile delivery routes for Mexico City",
+                module: "fulfillment",
+                priority: "low",
+                status: "todo",
+                dueDate: "2025-08-14",
+                createdDate: "2025-08-06"
+            },
+            {
+                id: 15,
+                title: "Carrier performance review",
+                description: "Evaluate shipping partner performance and costs",
+                module: "fulfillment",
+                priority: "medium",
+                status: "completed",
+                dueDate: "2025-08-03",
+                createdDate: "2025-07-30"
+            },
+            {
+                id: 16,
+                title: "Update packaging standards",
+                description: "Implement new eco-friendly packaging requirements",
+                module: "fulfillment",
+                priority: "high",
+                status: "progress",
+                dueDate: "2025-08-11",
+                createdDate: "2025-08-04"
+            },
+            {
+                id: 17,
+                title: "Return processing automation",
+                description: "Set up automated return processing workflow",
+                module: "fulfillment",
+                priority: "medium",
+                status: "todo",
+                dueDate: "2025-08-18",
+                createdDate: "2025-08-06"
+            },
+            
+            // Alarms & Alerts Tasks
+            {
+                id: 4,
+                title: "Resolve system alert",
+                description: "Database connection timeout - investigate and fix",
+                module: "alerts",
+                priority: "high",
+                status: "progress",
+                dueDate: "2025-08-06",
+                createdDate: "2025-08-06"
+            },
+            {
+                id: 18,
+                title: "Configure low stock alerts",
+                description: "Set up automated alerts for products approaching reorder points",
+                module: "alerts",
+                priority: "high",
+                status: "todo",
+                dueDate: "2025-08-09",
+                createdDate: "2025-08-06"
+            },
+            {
+                id: 19,
+                title: "System health monitoring",
+                description: "Implement comprehensive system health monitoring dashboard",
+                module: "alerts",
+                priority: "medium",
+                status: "progress",
+                dueDate: "2025-08-16",
+                createdDate: "2025-08-05"
+            },
+            {
+                id: 20,
+                title: "Alert notification cleanup",
+                description: "Remove obsolete alert rules and optimize notification frequency",
+                module: "alerts",
+                priority: "low",
+                status: "completed",
+                dueDate: "2025-08-02",
+                createdDate: "2025-07-28"
+            },
+            {
+                id: 21,
+                title: "Performance threshold tuning",
+                description: "Adjust performance alert thresholds based on recent data",
+                module: "alerts",
+                priority: "medium",
+                status: "todo",
+                dueDate: "2025-08-13",
+                createdDate: "2025-08-06"
+            }
+        ];
+
+        // Initialize the kanban board
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTasks();
+            setupEventListeners();
+            setupModalEvents();
+        });
+
+        function renderTasks(filter = 'all') {
+            const todoList = document.getElementById('todoList');
+            const progressList = document.getElementById('progressList');
+            const completedList = document.getElementById('completedList');
+
+            // Clear existing content
+            todoList.innerHTML = '';
+            progressList.innerHTML = '';
+            completedList.innerHTML = '';
+
+            // Filter tasks
+            const filteredTasks = filter === 'all' 
+                ? sampleTasks 
+                : sampleTasks.filter(task => task.module === filter);
+
+            // Group tasks by status
+            const todoTasks = filteredTasks.filter(task => task.status === 'todo');
+            const progressTasks = filteredTasks.filter(task => task.status === 'progress');
+            const completedTasks = filteredTasks.filter(task => task.status === 'completed');
+
+            // Render tasks in each column
+            renderTasksInColumn(todoTasks, todoList);
+            renderTasksInColumn(progressTasks, progressList);
+            renderTasksInColumn(completedTasks, completedList);
+
+            // Update counters
+            document.getElementById('todoCount').textContent = todoTasks.length;
+            document.getElementById('progressCount').textContent = progressTasks.length;
+            document.getElementById('completedCount').textContent = completedTasks.length;
+
+            // Show empty states if no tasks
+            if (todoTasks.length === 0) {
+                todoList.innerHTML = '<div class="empty-column"><div class="empty-icon">📋</div><p>No pending tasks</p></div>';
+            }
+            if (progressTasks.length === 0) {
+                progressList.innerHTML = '<div class="empty-column"><div class="empty-icon">⚙️</div><p>No active tasks</p></div>';
+            }
+            if (completedTasks.length === 0) {
+                completedList.innerHTML = '<div class="empty-column"><div class="empty-icon">🎯</div><p>No completed tasks</p></div>';
+            }
+        }
+
+        function renderTasksInColumn(tasks, container) {
+            tasks.forEach(task => {
+                const taskCard = createTaskCard(task);
+                container.appendChild(taskCard);
+            });
+        }
+
+        function createTaskCard(task) {
+            const card = document.createElement('div');
+            card.className = `task-card ${task.module}`;
+            card.setAttribute('data-task-id', task.id);
+            card.draggable = true;
+
+            const priorityClass = `priority-${task.priority}`;
+            const moduleClass = `module-${task.module}`;
+            const moduleNames = {
+                demand: 'Demand Forecasting',
+                fulfillment: 'Fulfillment',
+                inventory: 'Smart Inventory',
+                alerts: 'Alarms & Alerts'
+            };
+
+            card.innerHTML = `
+                <div class="task-header">
+                    <h4 class="task-title">${task.title}</h4>
+                    <span class="task-priority ${priorityClass}">${task.priority}</span>
+                </div>
+                <p class="task-description">${task.description}</p>
+                <div class="task-meta">
+                    <span class="task-module ${moduleClass}">${moduleNames[task.module]}</span>
+                    <span class="task-date">Due: ${task.dueDate}</span>
+                </div>
+            `;
+
+            // Add drag event listeners
+            card.addEventListener('dragstart', handleDragStart);
+            card.addEventListener('dragend', handleDragEnd);
+
+            return card;
+        }
+
+        function setupEventListeners() {
+            // Filter buttons
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Update active state
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Re-render with filter
+                    const filter = this.getAttribute('data-filter');
+                    renderTasks(filter);
+                });
+            });
+
+            // Add task button (placeholder)
+            document.getElementById('addTaskBtn').addEventListener('click', function() {
+                openAddTaskModal();
+            });
+
+            // Setup drag and drop for task lists
+            setupDragAndDrop();
+        }
+
+        // Drag and Drop functionality
+        let draggedElement = null;
+
+        function setupDragAndDrop() {
+            const taskLists = document.querySelectorAll('.task-list');
+            
+            taskLists.forEach(list => {
+                list.addEventListener('dragover', handleDragOver);
+                list.addEventListener('drop', handleDrop);
+                list.addEventListener('dragenter', handleDragEnter);
+                list.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.outerHTML);
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            draggedElement = null;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            if (this.classList.contains('task-list')) {
+                this.classList.add('drag-over');
+            }
+        }
+
+        function handleDragLeave(e) {
+            if (this.classList.contains('task-list')) {
+                this.classList.remove('drag-over');
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            
+            if (draggedElement && this.classList.contains('task-list')) {
+                const taskId = parseInt(draggedElement.getAttribute('data-task-id'));
+                const targetColumn = this.id;
+                
+                // Determine new status based on column
+                let newStatus;
+                if (targetColumn === 'todoList') newStatus = 'todo';
+                else if (targetColumn === 'progressList') newStatus = 'progress';
+                else if (targetColumn === 'completedList') newStatus = 'completed';
+                
+                // Update task status in data
+                const task = sampleTasks.find(t => t.id === taskId);
+                if (task && task.status !== newStatus) {
+                    task.status = newStatus;
+                    
+                    // Re-render to update the board
+                    const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+                    renderTasks(activeFilter);
+                    
+                    // Show success message
+                    showTaskMoveNotification(task.title, newStatus);
+                }
+            }
+        }
+
+        function showTaskMoveNotification(taskTitle, newStatus) {
+            const statusNames = {
+                todo: 'To Do',
+                progress: 'In Progress',
+                completed: 'Completed'
+            };
+            
+            // Create a simple notification (you could replace this with a toast library)
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--accent-green);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                z-index: 1000;
+                font-weight: 500;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+            `;
+            notification.textContent = `Task moved to ${statusNames[newStatus]}`;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Modal functionality
+        function setupModalEvents() {
+            const modal = document.getElementById('addTaskModal');
+            const closeBtn = document.getElementById('closeModal');
+            const cancelBtn = document.getElementById('cancelTask');
+            const form = document.getElementById('addTaskForm');
+
+            // Close modal events
+            closeBtn.addEventListener('click', closeAddTaskModal);
+            cancelBtn.addEventListener('click', closeAddTaskModal);
+            
+            // Close on overlay click
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeAddTaskModal();
+                }
+            });
+
+            // Close on Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    closeAddTaskModal();
+                }
+            });
+
+            // Form submission
+            form.addEventListener('submit', handleAddTask);
+
+            // Set default due date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('taskDueDate').value = tomorrow.toISOString().split('T')[0];
+        }
+
+        function openAddTaskModal() {
+            const modal = document.getElementById('addTaskModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            
+            // Focus on title input
+            setTimeout(() => {
+                document.getElementById('taskTitle').focus();
+            }, 300);
+        }
+
+        function closeAddTaskModal() {
+            const modal = document.getElementById('addTaskModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            
+            // Reset form
+            document.getElementById('addTaskForm').reset();
+            
+            // Reset due date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('taskDueDate').value = tomorrow.toISOString().split('T')[0];
+        }
+
+        function handleAddTask(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(e.target);
+            const title = document.getElementById('taskTitle').value.trim();
+            const description = document.getElementById('taskDescription').value.trim();
+            const module = document.getElementById('taskModule').value;
+            const priority = document.getElementById('taskPriority').value;
+            const dueDate = document.getElementById('taskDueDate').value;
+            const status = document.getElementById('taskStatus').value;
+
+            // Validate required fields
+            if (!title || !module || !priority) {
+                alert('Please fill in all required fields (Title, Module, Priority)');
+                return;
+            }
+
+            // Generate new task ID
+            const newId = Math.max(...sampleTasks.map(t => t.id)) + 1;
+            
+            // Create new task object
+            const newTask = {
+                id: newId,
+                title: title,
+                description: description || 'No description provided',
+                module: module,
+                priority: priority,
+                status: status,
+                dueDate: dueDate || new Date().toISOString().split('T')[0],
+                createdDate: new Date().toISOString().split('T')[0]
+            };
+
+            // Add to tasks array
+            sampleTasks.push(newTask);
+
+            // Close modal
+            closeAddTaskModal();
+
+            // Re-render tasks
+            const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+            renderTasks(activeFilter);
+
+            // Show success notification
+            showTaskAddedNotification(newTask.title);
+        }
+
+        function showTaskAddedNotification(taskTitle) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--accent-green);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                z-index: 1000;
+                font-weight: 500;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+            `;
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span>✅</span>
+                    <span>Task "${taskTitle}" created successfully!</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

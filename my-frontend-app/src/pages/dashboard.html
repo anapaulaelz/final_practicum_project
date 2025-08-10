@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission Control · COSMOS</title>
+    <link rel="stylesheet" href="../css/cosmic-sidebar.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+    <script src="../js/cosmic-sidebar.js"></script>
+    <style>
+        /* COSMOS Dashboard Theme */
+        :root {
+            --bg-primary: #0a0f1f;
+            --bg-card: #141b2d;
+            --bg-secondary: #1a2332;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --accent-blue: #4299e1;
+            --accent-yellow: #ecc94b;
+            --accent-red: #f56565;
+            --accent-green: #48bb78;
+            --accent-purple: #9f7aea;
+            --accent-orange: #ed8936;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .cosmic-header {
+            text-align: center;
+            padding: 3rem 0;
+            position: relative;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, 
+                rgba(16, 23, 42, 0.9) 0%, 
+                rgba(30, 41, 59, 0.8) 25%, 
+                rgba(45, 55, 72, 0.7) 50%, 
+                rgba(26, 35, 50, 0.8) 75%, 
+                rgba(10, 15, 31, 0.9) 100%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .cosmic-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(66, 153, 225, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(159, 122, 234, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 40% 70%, rgba(72, 187, 120, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(236, 201, 75, 0.15) 0%, transparent 50%);
+            animation: galaxyPulse 8s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        .cosmic-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.8), transparent),
+                radial-gradient(1px 1px at 40% 70%, rgba(255, 255, 255, 0.6), transparent),
+                radial-gradient(1px 1px at 90% 40%, rgba(255, 255, 255, 0.7), transparent),
+                radial-gradient(1px 1px at 70% 15%, rgba(255, 255, 255, 0.5), transparent),
+                radial-gradient(1px 1px at 15% 80%, rgba(255, 255, 255, 0.4), transparent);
+            background-size: 200px 200px, 150px 150px, 180px 180px, 120px 120px, 160px 160px;
+            animation: starsFloat 20s linear infinite;
+            z-index: 2;
+        }
+
+        .cosmic-header h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(
+                135deg, 
+                #4299e1 0%, 
+                #9f7aea 25%, 
+                #48bb78 50%, 
+                #ecc94b 75%, 
+                #4299e1 100%
+            );
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 6s ease-in-out infinite;
+            position: relative;
+            z-index: 3;
+            text-shadow: 0 0 30px rgba(66, 153, 225, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .cosmic-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            margin: 1rem 0 0 0;
+            position: relative;
+            z-index: 3;
+            font-weight: 400;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            opacity: 0.9;
+        }
+
+        .mission-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 3;
+            font-size: 0.9rem;
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .status-pulse {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+
+        @keyframes galaxyPulse {
+            0%, 100% { 
+                opacity: 0.8;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { 
+                background-position: 0% 50%; 
+            }
+            50% { 
+                background-position: 100% 50%; 
+            }
+        }
+
+        @keyframes starsFloat {
+            0% { 
+                transform: translateY(0px) translateX(0px); 
+            }
+            33% { 
+                transform: translateY(-10px) translateX(5px); 
+            }
+            66% { 
+                transform: translateY(5px) translateX(-5px); 
+            }
+            100% { 
+                transform: translateY(0px) translateX(0px); 
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 1; 
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.7; 
+                transform: scale(1.2);
+            }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h3 {
+            margin: 0 0 1rem 0;
+            color: var(--text-primary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-good { background: var(--accent-green); }
+        .status-warning { background: var(--accent-yellow); }
+        .status-critical { background: var(--accent-red); }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0.5rem 0;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .metric-change {
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+
+        .metric-change.positive { color: var(--accent-green); }
+        .metric-change.negative { color: var(--accent-red); }
+        .metric-change.neutral { color: var(--text-secondary); }
+
+        .chart-container {
+            height: 200px;
+            margin-top: 1rem;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            border-left: 3px solid var(--accent-yellow);
+        }
+
+        .alert-item.critical { border-left-color: var(--accent-red); }
+        .alert-item.info { border-left-color: var(--accent-blue); }
+
+        .alert-text {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .alert-time {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .task-item:last-child { border-bottom: none; }
+
+        .task-checkbox {
+            width: 16px;
+            height: 16px;
+            margin-right: 0.75rem;
+            accent-color: var(--accent-blue);
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .task-priority {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .priority-high { background: var(--accent-red); color: white; }
+        .priority-medium { background: var(--accent-yellow); color: black; }
+        .priority-low { background: var(--accent-green); color: white; }
+
+        .calendar-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .calendar-item:last-child { border-bottom: none; }
+
+        .calendar-time {
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-right: 1rem;
+            min-width: 60px;
+        }
+
+        .calendar-event {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .quick-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .nav-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+
+        .nav-card h4 {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--accent-blue);
+        }
+
+        .nav-card p {
+            margin: 0.5rem 0 0 0;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Health and Progress Bar Styles */
+        .health-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .health-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .health-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .health-value {
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Enhanced metric styles */
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0.5rem 0;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar will be injected here by cosmic-sidebar.js -->
+    <div class="main-content">
+        <header class="cosmic-header">
+            <h1>Mission Control</h1>
+            <p>Your unified command center for the COSMOS analytics platform</p>
+            <div class="mission-status">
+                <div class="status-pulse"></div>
+                <span>All Systems Operational</span>
+            </div>
+        </header>
+
+        <!-- Key Metrics Overview -->
+        <div class="dashboard-grid">
+            <!-- System Status -->
+            <div class="card">
+                <h3>
+                    <span class="status-indicator status-good"></span>
+                    System Status
+                </h3>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="metric-value" style="color: var(--accent-green);">99.2%</div>
+                        <div class="metric-label">Data Quality</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" style="color: var(--accent-blue);">2m</div>
+                        <div class="metric-label">Last Update</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Overview -->
+            <div class="card">
+                <h3>
+                    <span class="status-indicator status-critical"></span>
+                    Inventory Status
+                </h3>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="metric-value" style="color: var(--accent-red);" id="criticalStock">4</div>
+                        <div class="metric-label">Low Stock Items</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" style="color: var(--accent-blue);" id="totalUnits">162</div>
+                        <div class="metric-label">Total Units</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fulfillment Metrics -->
+            <div class="card">
+                <h3>
+                    <span class="status-indicator status-warning"></span>
+                    Fulfillment
+                </h3>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="metric-value" style="color: var(--accent-blue);" id="totalSales">$181.6K</div>
+                        <div class="metric-label">Recent Sales</div>
+                        <div class="metric-change positive" id="salesPeriod">Last 30 days</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" style="color: var(--accent-yellow);" id="avgFulfillment">4.7</div>
+                        <div class="metric-label">Avg Days</div>
+                        <div class="metric-change negative">Industry: 3-5</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Performance Indicators -->
+            <div class="card">
+                <h3>
+                    <span class="status-indicator status-good"></span>
+                    Performance Overview
+                </h3>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="metric-value" style="color: var(--accent-green);">↗ 15.2%</div>
+                        <div class="metric-label">Demand Growth</div>
+                        <div class="metric-change positive">vs last month</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" style="color: var(--accent-blue);">94.8%</div>
+                        <div class="metric-label">Forecast Accuracy</div>
+                        <div class="metric-change positive">+2.1%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue & Sales Snapshot -->
+            <div class="card">
+                <h3>
+                    <span class="status-indicator status-good"></span>
+                    Revenue Snapshot
+                </h3>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="metric-value" style="color: var(--accent-green);" id="recentRevenue">$181.6K</div>
+                        <div class="metric-label">Recent Revenue</div>
+                        <div class="metric-change positive" id="revenueGrowth">+15% vs prev</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" style="color: var(--accent-blue);" id="totalRevenue">$1.23M</div>
+                        <div class="metric-label">Total Revenue</div>
+                        <div class="metric-change positive" id="inventoryValue">Inv: $37.8K</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operational Health -->
+            <div class="card">
+                <h3>
+                    <span class="status-indicator status-warning"></span>
+                    Operational Health
+                </h3>
+                <div class="health-grid">
+                    <div class="health-item">
+                        <div class="health-label">Stock Health</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%; background: var(--accent-yellow);" id="stockHealth"></div>
+                        </div>
+                        <div class="health-value" id="stockHealthText">75% (4 low items)</div>
+                    </div>
+                    <div class="health-item">
+                        <div class="health-label">Fast Fulfillment</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%; background: var(--accent-red);" id="fastFulfillment"></div>
+                        </div>
+                        <div class="health-value" id="fastFulfillmentText">45% ≤4 days</div>
+                    </div>
+                    <div class="health-item">
+                        <div class="health-label">Data Freshness</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 95%; background: var(--accent-green);" id="dataFreshness"></div>
+                        </div>
+                        <div class="health-value" id="dataFreshnessText">95% Current</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Critical Alerts -->
+            <div class="card">
+                <h3>
+                    <span class="status-indicator status-critical"></span>
+                    Critical Alerts
+                </h3>
+                <div class="alert-item critical">
+                    <div class="alert-text">Low stock: 4 items below 50 units</div>
+                    <div class="alert-time">Real-time</div>
+                </div>
+                <div class="alert-item">
+                    <div class="alert-text">Avg fulfillment: 4.7 days (above target)</div>
+                    <div class="alert-time">Current</div>
+                </div>
+                <div class="alert-item info">
+                    <div class="alert-text">Data updated: Recent sales $181.6K</div>
+                    <div class="alert-time">Live</div>
+                </div>
+            </div>
+
+            <!-- Priority Tasks -->
+            <div class="card">
+                <h3>Priority Tasks</h3>
+                <div class="task-item">
+                    <input type="checkbox" class="task-checkbox">
+                    <div class="task-text">Review inventory levels</div>
+                    <div class="task-priority priority-high">HIGH</div>
+                </div>
+                <div class="task-item">
+                    <input type="checkbox" class="task-checkbox">
+                    <div class="task-text">Update forecast parameters</div>
+                    <div class="task-priority priority-medium">MED</div>
+                </div>
+                <div class="task-item">
+                    <input type="checkbox" class="task-checkbox">
+                    <div class="task-text">Process pending orders</div>
+                    <div class="task-priority priority-high">HIGH</div>
+                </div>
+            </div>
+
+            <!-- Today's Schedule -->
+            <div class="card">
+                <h3>Today's Schedule</h3>
+                <div class="calendar-item">
+                    <div class="calendar-time">09:00</div>
+                    <div class="calendar-event">Inventory review meeting</div>
+                </div>
+                <div class="calendar-item">
+                    <div class="calendar-time">14:00</div>
+                    <div class="calendar-event">Forecast analysis</div>
+                </div>
+                <div class="calendar-item">
+                    <div class="calendar-time">16:30</div>
+                    <div class="calendar-event">Supplier call - SKU-001</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Navigation -->
+        <div class="quick-nav">
+            <a href="demand-forecasting.html" class="nav-card">
+                <h4>Demand Forecasting</h4>
+                <p>Analyze future trends</p>
+            </a>
+            <a href="smart-inventory.html" class="nav-card">
+                <h4>Smart Inventory</h4>
+                <p>Optimize stock levels</p>
+            </a>
+            <a href="fulfillment.html" class="nav-card">
+                <h4>Fulfillment</h4>
+                <p>Track order processing</p>
+            </a>
+            <a href="todo-board.html" class="nav-card">
+                <h4>Task Board</h4>
+                <p>Manage workflows</p>
+            </a>
+            <a href="calendar.html" class="nav-card">
+                <h4>Calendar</h4>
+                <p>Schedule & events</p>
+            </a>
+            <a href="alarms-alerts.html" class="nav-card">
+                <h4>Alerts</h4>
+                <p>Monitor notifications</p>
+            </a>
+        </div>
+
+        <footer style="margin-top: 2rem; text-align: center; color: var(--text-secondary);">
+            <p>&copy; 2025 COSMOS - Space-Grade Analytics Platform</p>
+        </footer>
+    </div>
+
+    <script>
+        // Dashboard with Real Data Integration
+        let dashboardData = {
+            sales: null,
+            inventory: null,
+            fulfillment: null
+        };
+
+        // Load and process real data from CSV files
+        function loadDashboardData() {
+            console.log('Loading real dashboard data...');
+            
+            // Load sales data
+            Papa.parse('../../data/Total_sales_per_product.csv', {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(salesResults) {
+                    console.log('Sales data loaded:', salesResults.data.length, 'records');
+                    dashboardData.sales = salesResults.data;
+                    
+                    // Load inventory data
+                    Papa.parse('../../data/inventory_summary.csv', {
+                        download: true,
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: function(inventoryResults) {
+                            console.log('Inventory data loaded:', inventoryResults.data.length, 'records');
+                            dashboardData.inventory = inventoryResults.data;
+                            
+                            // Load fulfillment data
+                            Papa.parse('../../data/fulfillment_data.csv', {
+                                download: true,
+                                header: true,
+                                skipEmptyLines: true,
+                                complete: function(fulfillmentResults) {
+                                    console.log('Fulfillment data loaded:', fulfillmentResults.data.length, 'records');
+                                    dashboardData.fulfillment = fulfillmentResults.data;
+                                    
+                                    // Process and update dashboard
+                                    processRealData();
+                                },
+                                error: function(error) {
+                                    console.error('Error loading fulfillment data:', error);
+                                }
+                            });
+                        },
+                        error: function(error) {
+                            console.error('Error loading inventory data:', error);
+                        }
+                    });
+                },
+                error: function(error) {
+                    console.error('Error loading sales data:', error);
+                }
+            });
+        }
+
+        function processRealData() {
+            console.log('Processing real data for dashboard...');
+            
+            if (!dashboardData.sales || !dashboardData.inventory || !dashboardData.fulfillment) {
+                console.error('Not all data loaded yet');
+                return;
+            }
+
+            // Process Sales Data
+            const salesData = dashboardData.sales.map(row => ({
+                date: parseDate(row['Día']),
+                netSales: parseFloat(row['Ventas netas']) || 0,
+                product: row['Nombre del producto']
+            })).filter(row => row.date && !isNaN(row.netSales));
+
+            const totalSales = salesData.reduce((sum, row) => sum + row.netSales, 0);
+            const recentSales = salesData
+                .filter(row => row.date >= getDateDaysAgo(30))
+                .reduce((sum, row) => sum + row.netSales, 0);
+
+            // Process Inventory Data
+            const inventoryData = dashboardData.inventory.map(row => ({
+                sku: row['SKU de variante de producto'],
+                units: parseInt(row['Unidades de inventario finales']) || 0,
+                value: parseFloat(row['Valor final del inventario']) || 0,
+                product: row['Nombre del producto']
+            }));
+
+            // Get latest inventory per SKU
+            const latestInventory = {};
+            inventoryData.forEach(row => {
+                if (!latestInventory[row.sku] || row.units > 0) {
+                    latestInventory[row.sku] = row;
+                }
+            });
+
+            const inventoryArray = Object.values(latestInventory);
+            const totalUnits = inventoryArray.reduce((sum, item) => sum + item.units, 0);
+            const totalValue = inventoryArray.reduce((sum, item) => sum + item.value, 0);
+            const lowStockItems = inventoryArray.filter(item => item.units < 50);
+
+            // Process Fulfillment Data
+            const fulfillmentTimes = dashboardData.fulfillment.map(row => 
+                parseInt(row['Total Fulfillment Time (Business Days)']) || 0
+            ).filter(time => time > 0);
+
+            const avgFulfillment = fulfillmentTimes.reduce((sum, time) => sum + time, 0) / fulfillmentTimes.length;
+            const fastFulfillment = fulfillmentTimes.filter(time => time <= 4).length / fulfillmentTimes.length * 100;
+
+            // Update Dashboard Elements
+            updateDashboardValues({
+                totalSales: totalSales,
+                recentSales: recentSales,
+                totalUnits: totalUnits,
+                totalValue: totalValue,
+                lowStockCount: lowStockItems.length,
+                avgFulfillment: avgFulfillment,
+                fastFulfillmentPercent: fastFulfillment,
+                stockHealthPercent: Math.max(0, 100 - (lowStockItems.length / inventoryArray.length * 100))
+            });
+
+            console.log('Dashboard updated with real data');
+        }
+
+        function updateDashboardValues(data) {
+            // Update sales metrics
+            const recentRevenueEl = document.getElementById('recentRevenue');
+            const totalRevenueEl = document.getElementById('totalRevenue');
+            if (recentRevenueEl) recentRevenueEl.textContent = formatCurrency(data.recentSales);
+            if (totalRevenueEl) totalRevenueEl.textContent = formatCurrency(data.totalSales);
+
+            // Update inventory metrics
+            const criticalStockEl = document.getElementById('criticalStock');
+            const totalUnitsEl = document.getElementById('totalUnits');
+            if (criticalStockEl) criticalStockEl.textContent = data.lowStockCount;
+            if (totalUnitsEl) totalUnitsEl.textContent = data.totalUnits.toLocaleString();
+
+            // Update fulfillment metrics
+            const avgFulfillmentEl = document.getElementById('avgFulfillment');
+            if (avgFulfillmentEl) avgFulfillmentEl.textContent = data.avgFulfillment.toFixed(1);
+
+            // Update progress bars
+            const stockHealthBar = document.getElementById('stockHealth');
+            const stockHealthText = document.getElementById('stockHealthText');
+            if (stockHealthBar) {
+                stockHealthBar.style.width = data.stockHealthPercent + '%';
+                stockHealthBar.style.background = data.stockHealthPercent > 80 ? 'var(--accent-green)' : 
+                                                  data.stockHealthPercent > 60 ? 'var(--accent-yellow)' : 'var(--accent-red)';
+            }
+            if (stockHealthText) stockHealthText.textContent = `${Math.round(data.stockHealthPercent)}% (${data.lowStockCount} low items)`;
+
+            const fastFulfillmentBar = document.getElementById('fastFulfillment');
+            const fastFulfillmentText = document.getElementById('fastFulfillmentText');
+            if (fastFulfillmentBar) {
+                fastFulfillmentBar.style.width = data.fastFulfillmentPercent + '%';
+                fastFulfillmentBar.style.background = data.fastFulfillmentPercent > 70 ? 'var(--accent-green)' : 
+                                                      data.fastFulfillmentPercent > 50 ? 'var(--accent-yellow)' : 'var(--accent-red)';
+            }
+            if (fastFulfillmentText) fastFulfillmentText.textContent = `${Math.round(data.fastFulfillmentPercent)}% ≤4 days`;
+        }
+
+        // Utility functions
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                const day = parseInt(parts[0]);
+                const month = parseInt(parts[1]) - 1; // Month is 0-indexed
+                const year = parseInt(parts[2]) + 2000; // Assuming 2-digit year
+                return new Date(year, month, day);
+            }
+            return null;
+        }
+
+        function getDateDaysAgo(days) {
+            const date = new Date();
+            date.setDate(date.getDate() - days);
+            return date;
+        }
+
+        function formatCurrency(amount) {
+            if (amount >= 1000000) {
+                return '$' + (amount / 1000000).toFixed(1) + 'M';
+            } else if (amount >= 1000) {
+                return '$' + (amount / 1000).toFixed(1) + 'K';
+            } else {
+                return '$' + amount.toFixed(0);
+            }
+        }
+
+        // Animate progress bars on load
+        function animateProgressBars() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const targetWidth = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = targetWidth;
+                }, 500);
+            });
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard initializing...');
+            animateProgressBars();
+            
+            // Load real data
+            loadDashboardData();
+            
+            // Add click handlers to task checkboxes
+            const checkboxes = document.querySelectorAll('.task-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const taskText = this.nextElementSibling;
+                    if (this.checked) {
+                        taskText.style.textDecoration = 'line-through';
+                        taskText.style.opacity = '0.6';
+                    } else {
+                        taskText.style.textDecoration = 'none';
+                        taskText.style.opacity = '1';
+                    }
+                });
+            });
+        });
+
+        // Auto-refresh data every 5 minutes
+        setInterval(loadDashboardData, 300000);
+    </script>
+    <script src="../js/main.js"></script>
+</body>
+</html>
